@@ -9,4 +9,6 @@ add_executable(Excavate main.cpp
         TerrainCore/PerlinNoise.cpp
         TerrainCore/PerlinNoise.h
         TerrainCore/Pinceau.cpp
-        TerrainCore/Pinceau.h)
+        TerrainCore/Pinceau.h
+        TerrainCore/MarchingCubes.cpp
+        TerrainCore/MarchingCubes.h)

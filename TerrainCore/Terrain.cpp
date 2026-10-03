@@ -1,7 +1,10 @@
 #include "Terrain.h"
 
+#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <ostream>
+#include <random>
 
 #include "PerlinNoise.h"
 
@@ -13,7 +16,7 @@ std::map<std::vector<int>, double> TerrainCore::Terrain::createChunk(int _chunkS
     for (int x = 0; x < _chunkSize+1; x++) {
         for (int y = 0; y < _chunkSize+1; y++) {
             for (int z = 0; z < _chunkSize+1; z++) {
-                _chunkPoints.insert(std::pair<std::vector<int>, double>({x, y, z}, 0));
+                _chunkPoints.insert(std::pair<std::vector<int>, double>({x, y, z}, 1));
             }
         }
     }
@@ -22,12 +25,19 @@ std::map<std::vector<int>, double> TerrainCore::Terrain::createChunk(int _chunkS
 
 std::map<std::vector<int>, double> TerrainCore::Terrain::generateChunkNoise(std::map<std::vector<int>, double> _chunk) {
 
-    int index = 0;
+    double min = 0;
+    double max = 0;
+
     for (auto& _point : _chunk) {
+
         std::vector<int> _pointCoordinate = _point.first;
-        _point.second = PerlinNoise::makeNoise(_pointCoordinate[0]+0.5, _pointCoordinate[1]+0.5, _pointCoordinate[2]+0.5);
-        index++;
+        _point.second = PerlinNoise::makeNoise(_pointCoordinate[0]*0.05, _pointCoordinate[1]*0.05, _pointCoordinate[2]*0.05);
+
+        if (_point.second < min) min = _point.second;
+        if (_point.second > max) max = _point.second;
     }
+    std::cout << "min = " << min  << std::endl;
+    std::cout << "max = " << max << std::endl;
     return _chunk;
 }
 
@@ -36,4 +46,8 @@ std::map<std::vector<int>, double> TerrainCore::Terrain::generateTerrain() {
     std::map<std::vector<int>, double> _chunk = createChunk(chunkSize);
     _chunk = generateChunkNoise(_chunk);
     return _chunk;
+}
+
+int TerrainCore::Terrain::GetChunkSize() {
+    return chunkSize;
 }

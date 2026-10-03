@@ -17,6 +17,8 @@ public:
 
     static std::map<std::vector<int>, double> generateTerrain();
 
+    static int GetChunkSize();
+
 };
 
 }

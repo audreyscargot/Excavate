@@ -8,40 +8,37 @@
 #include <iostream>
 #include <random>
 
-static int radius = 2;
+static int radius = 15;
+static int reach = radius +0.1;
 
-void Pinceau::sphereTestFunction(std::map<std::vector<int>, double>& _chunk) {
-
+void Pinceau::sphereTestFunction(std::map<std::vector<int>, double>& _chunk, double _surfaceLevel, bool _isRemoving) {
     unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 mt(a);
 
     auto it = _chunk.begin();
     std::advance(it, mt() % _chunk.size());
-    const std::vector<int> _randomKey = it->first;
 
-    int x = _randomKey[0];
-    int y = _randomKey[1];
-    int z = _randomKey[2];
+    int x = it->first[0];
+    int y = it->first[1];
+    int z = it->first[2];
 
     std::vector<std::vector<int>> _sphere;
     std::vector<int> _tempPoint = {x, y, z};
-    for (int i = -radius; i < radius+1; i++) {
-        for (int j = -radius; j < radius+1; j++) {
-            for (int k = -radius; k < radius+1; k++) {
+    for (int i = -reach; i < reach; i++) {
+        for (int j = -reach; j < reach; j++) {
+            for (int k = -reach; k < reach; k++) {
                 _tempPoint = {x+i, y+j, z+k};
-                if (distance(_tempPoint, {x,y,z}) <= radius) {
-                    _sphere.push_back(_tempPoint);
+                if (distance(_tempPoint, {x,y,z}) > reach) {
+                    continue;
+                    }
+                if (_chunk.find(_tempPoint) == _chunk.end()) {
+                    continue;
                 }
+                double _hole = _isRemoving ? _surfaceLevel + ((radius - distance(_tempPoint, {x,y,z})) * 0.5) : _surfaceLevel - ((radius - distance(_tempPoint, {x,y,z})) * 0.5) ;
+                _chunk[_tempPoint] = _isRemoving ? std::max(_chunk[_tempPoint],_hole) : std::min(_chunk[_tempPoint], _hole);
             }
         }
     }
-
-    for (int i = 0; i < _sphere.size(); i++) {
-        if (_chunk.find(_sphere[i]) != _chunk.end()) {
-            _chunk[_sphere[i]] = 0;
-        }
-    }
-
 }
 
 double Pinceau::distance(std::vector<int> _vec1, std::vector<int> _vec2) {
