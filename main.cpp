@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cmath>
 
 #include "TerrainCore/MarchingCubes.h"
 #include "TerrainCore/PerlinNoise.h"
@@ -42,11 +43,13 @@ int main() {
 
     PerlinNoise::makePermutationTable();
     std::map<std::vector<int>, double> Chunk = TerrainCore::Terrain::generateTerrain();
-    Pinceau::sphereTestFunction(Chunk, -0.2, false);
-    for (int i = 0; i < TerrainCore::Terrain::GetChunkSize(); i++) {
+    int size = TerrainCore::Terrain::GetChunkSize();
+    Pinceau::sphereFunction(Chunk, -0.2, true, floor(size/2), floor(size/2), floor(size/2));
+    std::cout << "floor " << floor(Chunk.size()/2) << std::endl;
+    for (int i = 0; i < size; i++) {
         std::cout << i << std::endl;
-        for (int j = 0; j < TerrainCore::Terrain::GetChunkSize(); j++) {
-            for (int k = 0; k < TerrainCore::Terrain::GetChunkSize() ; k++) {
+        for (int j = 0; j < size; j++) {
+            for (int k = 0; k < size ; k++) {
                 MarchingCubes::sampleVertices(Chunk, i, j, k);
             }
         }

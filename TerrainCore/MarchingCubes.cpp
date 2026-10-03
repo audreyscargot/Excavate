@@ -5,7 +5,7 @@
 #include "MarchingCubes.h"
 #include <cmath>
 
-static double surfaceLevel = -0.2;
+static double surfaceLevel = 0.2;
 static int triangulationTable[256][16] = {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},

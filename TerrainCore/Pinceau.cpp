@@ -8,11 +8,11 @@
 #include <iostream>
 #include <random>
 
-static int radius = 15;
+static int radius = 7;
 static int reach = radius +0.1;
 
-void Pinceau::sphereTestFunction(std::map<std::vector<int>, double>& _chunk, double _surfaceLevel, bool _isRemoving) {
-    unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
+void Pinceau::sphereFunction(std::map<std::vector<int>, double>& _chunk, double _surfaceLevel, bool _isRemoving, int x, int y, int z) {
+    /*unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 mt(a);
 
     auto it = _chunk.begin();
@@ -20,9 +20,8 @@ void Pinceau::sphereTestFunction(std::map<std::vector<int>, double>& _chunk, dou
 
     int x = it->first[0];
     int y = it->first[1];
-    int z = it->first[2];
+    int z = it->first[2];*/
 
-    std::vector<std::vector<int>> _sphere;
     std::vector<int> _tempPoint = {x, y, z};
     for (int i = -reach; i < reach; i++) {
         for (int j = -reach; j < reach; j++) {
@@ -39,6 +38,25 @@ void Pinceau::sphereTestFunction(std::map<std::vector<int>, double>& _chunk, dou
             }
         }
     }
+}
+
+void Pinceau::cubeFunction(std::map<std::vector<int>, double> &_chunk, double _surfaceLevel, bool _isRemoving, int x,
+    int y, int z) {
+
+    std::vector<int> _tempPoint = {x, y, z};
+    for (int i = -reach; i < reach; i++) {
+        for (int j = -reach; j < reach; j++) {
+            for (int k = -reach; k < reach; k++) {
+                _tempPoint = {x+i, y+j, z+k};
+                if (_chunk.find(_tempPoint) == _chunk.end()) {
+                    continue;
+                }
+                double _hole = _isRemoving ? _surfaceLevel + (radius - (radius - x)*(radius-y)*(radius-z) * 0.5) : _surfaceLevel - (radius - (radius - x)*(radius-y)*(radius-z) * 0.5) ;
+                _chunk[_tempPoint] = _isRemoving ? std::max(_chunk[_tempPoint],_hole) : std::min(_chunk[_tempPoint], _hole);
+            }
+        }
+    }
+
 }
 
 double Pinceau::distance(std::vector<int> _vec1, std::vector<int> _vec2) {
