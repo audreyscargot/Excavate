@@ -5,23 +5,19 @@
 #include "PerlinNoise.h"
 
 #include <algorithm>
-#include <chrono>
 #include <cmath>
 #include <random>
-#include <bits/locale_classes.h>
 
 std::vector<int> PerlinNoise::permutationTable = {};
 
 PerlinNoise::PerlinNoise() = default;
 
-void PerlinNoise::makePermutationTable() {
+void PerlinNoise::makePermutationTable(unsigned a) {
 
     permutationTable.clear();
     for (int i = 0; i < 256; i++) {
         permutationTable.push_back(i);
     }
-
-    unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
 
     std::mt19937 seed(a);
 

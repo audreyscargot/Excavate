@@ -14,7 +14,7 @@ class PerlinNoise {
     static std::vector<int> permutationTable;
 
     PerlinNoise();
-    static void makePermutationTable();
+    static void makePermutationTable(unsigned a);
 
     static double makeNoise(double x, double y, double z);
 

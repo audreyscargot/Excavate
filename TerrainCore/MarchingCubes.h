@@ -12,7 +12,7 @@ class MarchingCubes {
 
 public:
 
-    static void sampleVertices(const std::map<std::vector<int>, double>& _chunk, int x, int y, int z);
+    static void sampleVertices(const std::map<std::vector<int>, double>& _chunk, int a, int b, int c, int xW, int yW, int zW, int size);
 
     static double makeValue(const std::map<std::vector<int>, double>& _chunk, int x, int y, int z, double _deadValue);
 
@@ -24,9 +24,13 @@ public:
 
     static int createTriangles(int _cubeIndex, const std::vector<std::vector<double>>& _vertList, const std::vector<std::vector<double>>& _normalList);
 
-    static std::vector<std::vector<std::vector<double>>> GetTriangles();
+    const static std::vector<std::vector<std::vector<double>>>& GetTriangles();
 
-    static std::vector<std::vector<std::vector<double>>> GetNormals();
+    const static std::vector<std::vector<std::vector<double>>>& GetNormals();
+
+    static double GetSurfaceLevel();
+
+    static void Reset();
 
 
 };

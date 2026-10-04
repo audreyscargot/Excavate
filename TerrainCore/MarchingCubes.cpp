@@ -5,7 +5,7 @@
 #include "MarchingCubes.h"
 #include <cmath>
 
-static double surfaceLevel = 0.2;
+static double surfaceLevel = -0.2;
 static int triangulationTable[256][16] = {{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 {0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -299,12 +299,16 @@ static std::vector<std::vector<std::vector<double>>> triangles = {};
 static std::vector<std::vector<std::vector<double>>> normals = {};
 static int triangleIndex = 0;
 
-void MarchingCubes::sampleVertices(const std::map<std::vector<int>, double>& _chunk, int x, int y, int z) {
+void MarchingCubes::sampleVertices(const std::map<std::vector<int>, double>& _chunk, int a, int b, int c, int xW, int yW, int zW, int size) {
 
     std::vector<double> cubeValues;
     int cubeIndex = 0;
     std::vector<std::vector<double>> vertList(12);
     std::vector<std::vector<double>> normalList(12);
+
+    int x = xW * size + a;
+    int y = yW * size + b;
+    int z = zW * size + c;
 
     //bottom vertices
     cubeValues.push_back(_chunk.find({x,y,z})->second);
@@ -461,11 +465,21 @@ int MarchingCubes::createTriangles(int _cubeIndex, const std::vector<std::vector
     return triangleIndex;
 }
 
-std::vector<std::vector<std::vector<double>>> MarchingCubes::GetTriangles() {
+const std::vector<std::vector<std::vector<double>>>& MarchingCubes::GetTriangles() {
     return triangles;
 }
 
-std::vector<std::vector<std::vector<double>>> MarchingCubes::GetNormals() {
+const std::vector<std::vector<std::vector<double>>>& MarchingCubes::GetNormals(){
     return normals;
+}
+
+double MarchingCubes::GetSurfaceLevel() {
+    return surfaceLevel;
+}
+
+void MarchingCubes::Reset() {
+    triangles.clear();
+    normals.clear();
+    triangleIndex = 0;
 }
 ;

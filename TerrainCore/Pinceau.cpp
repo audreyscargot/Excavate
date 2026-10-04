@@ -4,15 +4,18 @@
 
 #include "Pinceau.h"
 
-#include <chrono>
+#include <vector>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
-static int radius = 7;
-static int reach = radius +0.1;
+#include "MarchingCubes.h"
 
-void Pinceau::sphereFunction(std::map<std::vector<int>, double>& _chunk, double _surfaceLevel, bool _isRemoving, int x, int y, int z) {
-    /*unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
+static int radius = 20;
+static int reach = radius + 1;
+
+/* void Pinceau::sphereFunction(std::map<std::vector<int>, double>& _chunk, double _surfaceLevel, bool _isRemoving, int x, int y, int z) {
+    unsigned a = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 mt(a);
 
     auto it = _chunk.begin();
@@ -20,7 +23,7 @@ void Pinceau::sphereFunction(std::map<std::vector<int>, double>& _chunk, double 
 
     int x = it->first[0];
     int y = it->first[1];
-    int z = it->first[2];*/
+    int z = it->first[2];
 
     std::vector<int> _tempPoint = {x, y, z};
     for (int i = -reach; i < reach; i++) {
@@ -57,7 +60,78 @@ void Pinceau::cubeFunction(std::map<std::vector<int>, double> &_chunk, double _s
         }
     }
 
+}*/
+
+std::vector<int> Pinceau::crossingChunk(int p, int sizeChunk, int sizeLnd) {
+
+    std::vector<int> result;
+    if (p<0) return result; // coordonnées hors du chunk
+    int c = p / sizeChunk;
+    if (c < sizeLnd) result.push_back(c);
+    if (p % sizeChunk == 0 && c-1 >=0) result.push_back(c-1); // si p % sizeChunk == 0 ça appartient au chunk d'avant et on check si le chunk d'avant existe
+    return result;
+
+    //retourne tous les chunks touchés par un point
+
 }
+
+void Pinceau::sphereBrush(std::vector<std::map<std::vector<int>, double>> &_landscape, double _surfaceLevel,
+                          bool _isRemoving, int xW, int yW, int zW, int sizeChunk, int sizeLnd) {
+    std::vector<int> _tempPoint = {xW, yW, zW};
+    std::vector<int> _touchedChunks;
+
+    for (int i = -reach; i <= reach; i++) {
+        for (int j = -reach; j <= reach; j++) {
+            for (int k = -reach; k <= reach; k++) {
+                _tempPoint = {xW+i, yW+j, zW+k};
+                if (distance(_tempPoint, {xW,yW,zW}) > reach) {
+                    continue;
+                }
+
+                int xChunk = _tempPoint[0]/sizeChunk;
+                int yChunk = _tempPoint[1]/sizeChunk;
+                int zChunk = _tempPoint[2]/sizeChunk;
+
+                int pointIndex = xChunk * sizeLnd * sizeLnd + yChunk * sizeLnd + zChunk;
+                auto& _chunkToChange = _landscape[pointIndex];
+
+                double d = distance(_tempPoint, {xW,yW,zW});
+                double _hole = _isRemoving ? _surfaceLevel + (radius -d * 0.5) : _surfaceLevel - (radius - d) * 0.5; //pour avoir un gradient
+                double currentValue = _chunkToChange.find({_tempPoint[0], _tempPoint[1], _tempPoint[2]})->second;
+                _chunkToChange.find({_tempPoint[0], _tempPoint[1], _tempPoint[2]})->second = _isRemoving ? std::max(currentValue,_hole) : std::min(currentValue, _hole);
+
+                //pour chaque point on check tous les chunks touchés
+                for (int cx : crossingChunk(_tempPoint[0], sizeChunk, sizeLnd)) {
+                    for (int cy : crossingChunk(_tempPoint[1], sizeChunk, sizeLnd)) {
+                        for (int cz : crossingChunk(_tempPoint[2], sizeChunk, sizeLnd)) {
+
+                            int index = cx * sizeLnd * sizeLnd + cy * sizeLnd + cz;
+
+                            auto it = _landscape[index].find(_tempPoint);
+                            if (it == _landscape[index].end()) continue;
+
+                            it->second = _isRemoving ? std::max(it->second, _hole) : std::min(it->second, _hole);
+                            _touchedChunks.push_back(index);
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+    /* for (auto it : _chunksCoord) {
+        //marching cubes
+        for (int a = 0; a < sizeChunk; a++) {
+            for (int b = 0; b < sizeChunk; b++) {
+                for (int c = 0; c < sizeChunk ; c++) {
+                    MarchingCubes::sampleVertices(_landscape[it],a,b,c, it / (sizeLnd*sizeLnd), it / sizeLnd % sizeLnd, it % sizeLnd, sizeChunk);
+                }
+            }
+        }
+
+    } */
 
 double Pinceau::distance(std::vector<int> _vec1, std::vector<int> _vec2) {
 
