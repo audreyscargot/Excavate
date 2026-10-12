@@ -323,7 +323,7 @@ void MarchingCubes::sampleVertices(const std::map<std::vector<int>, double>& _ch
     cubeValues.push_back(_chunk.find({x,y+1,z+1})->second);
 
     for (int i = 0; i < 8; i++) {
-        if (cubeValues[i] < surfaceLevel) { //si la valeur est supérieure au surface level, on la note
+        if (cubeValues[i] < surfaceLevel) { //si la valeur est inférieure au surface level, on la note pour savoir quel coin sont "vide"
             cubeIndex |= (1 << i);
         }
     }
